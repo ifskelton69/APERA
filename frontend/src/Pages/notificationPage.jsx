@@ -1,7 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { acceptFriendRequest, getFriendRequests } from "../lib/api";
-import { BellIcon, ClockIcon, MessageSquareIcon, UserCheckIcon } from "lucide-react";
+import { acceptFriendRequest, getFriendRequests, rejectFriendRequest } from "../lib/api";
+import { BellIcon, ClockIcon, MessageSquareIcon, UserCheckIcon, XIcon } from "lucide-react";
 import NoNotificationsFound from "../components/NoNotificationsFound.jsx";
+import toast from "react-hot-toast";
 
 const NotificationsPage = () => {
   const queryClient = useQueryClient();
@@ -11,12 +12,28 @@ const NotificationsPage = () => {
     queryFn: getFriendRequests,
   });
 
-  const { mutate: acceptRequestMutation, isPending } = useMutation({
+  const { mutate: acceptRequestMutation, isPending: isAccepting } = useMutation({
     mutationFn: acceptFriendRequest,
     onSuccess: () => {
+      toast.success("Friend request accepted!");
       queryClient.invalidateQueries({ queryKey: ["friendRequests"] });
       queryClient.invalidateQueries({ queryKey: ["friends"] });
+      queryClient.invalidateQueries({ queryKey: ["recommendedUsers"] }); // Refresh home page
     },
+    onError: (error) => {
+      toast.error(error?.response?.data?.message || "Failed to accept request");
+    }
+  });
+
+  const { mutate: rejectRequestMutation, isPending: isRejecting } = useMutation({
+    mutationFn: rejectFriendRequest,
+    onSuccess: () => {
+      toast.success("Friend request rejected");
+      queryClient.invalidateQueries({ queryKey: ["friendRequests"] });
+    },
+    onError: (error) => {
+      toast.error(error?.response?.data?.message || "Failed to reject request");
+    }
   });
 
   const incomingRequests = friendRequests?.incomingReqs || [];
@@ -50,29 +67,42 @@ const NotificationsPage = () => {
                       <div className="card-body p-4">
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-3">
-                            <div className="avatar w-14 h-14 rounded-full bg-base-300">
-                              <img src={request.sender.profilePic} alt={request.sender.fullName} />
+                            <div className="avatar w-14 h-14 rounded-full bg-base-300 overflow-hidden">
+                              <img
+                                src={request.sender?.profilePic || `https://ui-avatars.com/api/?name=${encodeURIComponent(request.sender?.fullName || 'User')}&background=random`}
+                                alt={request.sender?.fullName || "User"}
+                                onError={(e) => {
+                                  e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(request.sender?.fullName || 'User')}&background=random`;
+                                }}
+                              />
                             </div>
                             <div>
-                              <h3 className="font-semibold">{request.sender.fullName}</h3>
-                              <div className="flex flex-wrap gap-1.5 mt-1">
-                                <span className="badge badge-secondary badge-sm">
-                                  Native: {request.sender.nativeLanguage}
-                                </span>
-                                <span className="badge badge-outline badge-sm">
-                                  Learning: {request.sender.learningLanguage}
-                                </span>
-                              </div>
+                              <h3 className="font-semibold">{request.sender?.fullName || "Unknown User"}</h3>
+                              {request.sender?.bio && (
+                                <p className="text-sm opacity-70 line-clamp-1">{request.sender.bio}</p>
+                              )}
+                              {request.sender?.location && (
+                                <p className="text-xs opacity-60">{request.sender.location}</p>
+                              )}
                             </div>
                           </div>
 
-                          <button
-                            className="btn btn-primary btn-sm"
-                            onClick={() => acceptRequestMutation(request._id)}
-                            disabled={isPending}
-                          >
-                            Accept
-                          </button>
+                          <div className="flex gap-2">
+                            <button
+                              className="btn btn-primary btn-sm"
+                              onClick={() => acceptRequestMutation(request._id)}
+                              disabled={isAccepting || isRejecting}
+                            >
+                              {isAccepting ? "Accepting..." : "Accept"}
+                            </button>
+                            <button
+                              className="btn btn-ghost btn-sm"
+                              onClick={() => rejectRequestMutation(request._id)}
+                              disabled={isAccepting || isRejecting}
+                            >
+                              <XIcon className="h-4 w-4" />
+                            </button>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -81,7 +111,7 @@ const NotificationsPage = () => {
               </section>
             )}
 
-            {/* ACCEPTED REQS NOTIFICATONS */}
+            {/* ACCEPTED REQS NOTIFICATIONS */}
             {acceptedRequests.length > 0 && (
               <section className="space-y-4">
                 <h2 className="text-xl font-semibold flex items-center gap-2">
@@ -94,20 +124,23 @@ const NotificationsPage = () => {
                     <div key={notification._id} className="card bg-base-200 shadow-sm">
                       <div className="card-body p-4">
                         <div className="flex items-start gap-3">
-                          <div className="avatar mt-1 size-10 rounded-full">
+                          <div className="avatar mt-1 size-12 text-2xl rounded-full overflow-hidden">
                             <img
-                              src={notification.recipient.profilePic}
-                              alt={notification.recipient.fullName}
-                            />
+                                src={friendRequests.profilePic || `https://ui-avatars.com/api/?name=${encodeURIComponent(friendRequests.fullName || 'User')}&background=random`}
+                                alt={friendRequests.fullName || "User"}
+                                onError={(e) => {
+                                  e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(friendRequests.fullName || 'User')}&background=4F46E5`;
+                                }}
+                              />
                           </div>
                           <div className="flex-1">
-                            <h3 className="font-semibold">{notification.recipient.fullName}</h3>
-                            <p className="text-sm my-1">
-                              {notification.recipient.fullName} accepted your friend request
+                            <h3 className="font-semibold text-2xl">{notification.recipient?.fullName || "Someone"}</h3>
+                            <p className="text-sm ">
+                              {notification.recipient?.fullName || "Someone"} accepted your friend request
                             </p>
                             <p className="text-xs flex items-center opacity-70">
                               <ClockIcon className="h-3 w-3 mr-1" />
-                              Recently
+                              {new Date(notification.updatedAt || notification.createdAt).toLocaleDateString()}
                             </p>
                           </div>
                           <div className="badge badge-success">

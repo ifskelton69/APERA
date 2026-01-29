@@ -1,6 +1,7 @@
 import User from '../models/Users.js';
 import jwt from 'jsonwebtoken';
 import { upsertStreamUser } from '../lib/stream.js';
+import cloudinary from '../lib/cloudinary.js';
 
 export async function signUp(req, res) {
   const { email, password, fullName } = req.body;
@@ -24,15 +25,15 @@ export async function signUp(req, res) {
       return res.status(400).json({ message: "Email already exists, please use a different one" });
     }
 
-    const idx = Math.floor(Math.random() * 100) + 1;
-    const randomAvatar = `https://avatar.iran.liara.run/public/${idx}.png`;
+    // Use ui-avatars.com instead - it's more reliable
+    const randomAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(fullName)}&background=random&size=200`;
 
     const newUser = await User.create({
       email,
       fullName,
       password,
       profilePic: randomAvatar,
-      location: "Not specified",
+      location: "",
       learningLanguage: "English",
       nativeLand: "Not specified"
     });
@@ -48,7 +49,6 @@ export async function signUp(req, res) {
       console.error("Error syncing with Stream:", error);
     }
 
-    // Fixed: Use consistent JWT_SECRET (not JWT_SECRET_KEY)
     const token = jwt.sign({ userId: newUser._id }, process.env.JWT_SECRET, {
       expiresIn: "7d",
     });
@@ -110,32 +110,62 @@ export function logout(req, res) {
 
 export async function onboard(req, res) {
   const userId = req.user._id;
-  const { location, fullName, bio } = req.body;
+  const { location, fullName, bio, profilePic } = req.body;
+  
   try {
-    if (!location || !fullName || !bio) {
+    if (!fullName || !fullName.trim()) {
       return res.status(400).json({
-        message: "All fields are required", missingfields: [
-          !location && 'city,country',
-          !fullName && 'fullName',
-          !bio && 'bio'
-        ].filter(Boolean)
+        message: "Full name is required"
       });
     }
 
-    const updatedUser = await User.findByIdAndUpdate(userId, {
-      ...req.body,
+    const updateData = {
+      fullName: fullName.trim(),
+      bio: bio || "",
+      location: location || "",
       isOnBoarded: true,
-    }, { new: true });
+    };
+
+    // Upload to Cloudinary if profilePic is provided and it's base64
+    if (profilePic && profilePic.trim() && profilePic.startsWith('data:image')) {
+      try {
+        
+        // Use unsigned upload with upload_preset
+        const uploadResponse = await cloudinary.uploader.unsigned_upload(
+          profilePic,
+          'profile_pictures', // This is your upload preset name
+          {
+            cloud_name: process.env.CLOUDINARY_CLOUD_NAME
+          }
+        );
+        
+        updateData.profilePic = uploadResponse.secure_url;
+      } catch (uploadError) {
+        return res.status(500).json({ message: "Error uploading image" });
+      }
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(
+      userId, 
+      updateData,
+      { new: true, runValidators: false }
+    );
+
     if (!updatedUser) {
       return res.status(404).json({ message: "User not found" });
     }
+
     try {
-      await upsertStreamUser({ id: updatedUser._id.toString(), name: updatedUser.fullName, image: updatedUser.profilePic || "" });
+      await upsertStreamUser({ 
+        id: updatedUser._id.toString(), 
+        name: updatedUser.fullName, 
+        image: updatedUser.profilePic || "" 
+      });
       console.log(`Stream user updated for ${updatedUser.fullName}`);
     } catch (error) {
       console.error("Error syncing with Stream:", error);
-      return res.status(500).json({ message: "Internal Server Error" });
     }
+
     res.status(200).json({ success: true, user: updatedUser });
   }
   catch (error) {

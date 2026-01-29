@@ -1,0 +1,22 @@
+{
+  "name": "apera",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "server": "npm run dev --prefix backend",
+    "client": "npm run dev --prefix frontend",
+    "dev": "concurrently \"npm run server\" \"npm run client\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ifskelton69/APERA.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ifskelton69/APERA/issues"
+  },
+  "homepage": "https://github.com/ifskelton69/APERA#readme",
+  "license": "ISC",
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
+}

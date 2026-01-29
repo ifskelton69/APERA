@@ -38,7 +38,7 @@ const HomePage = () => {
     onSuccess: (data, variables) => {
       // Keep the user ID in outgoing requests
       setOutgoingRequests(prev => new Set([...prev, variables]));
-      
+
       // Invalidate queries to get fresh data
       queryClient.invalidateQueries({ queryKey: ['outgoingFriendReqs'] });
       queryClient.invalidateQueries({ queryKey: ['users'] });
@@ -85,7 +85,7 @@ const HomePage = () => {
             <div className='w-2 h-8 bg-gradient-to-b from-primary to-secondary rounded-full'></div>
             <h2 className='text-2xl sm:text-3xl font-bold'>Your Friends</h2>
             {friends.length > 0 && (
-              <div className="badge badge-primary badge-lg animate-bounce">
+              <div className="badge badge-primary badge-lg ">
                 {friends.length}
               </div>
             )}
@@ -122,7 +122,7 @@ const HomePage = () => {
           <div className='flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6'>
             <div className='space-y-2'>
               <div className='flex items-center gap-3'>
-                <div className='w-2 h-8 bg-gradient-to-b from-secondary to-accent rounded-full '/>
+                <div className='w-2 h-8 bg-gradient-to-b from-secondary to-accent rounded-full ' />
                 <h2 className='text-2xl sm:text-3xl font-bold flex items-center gap-2'>
                   People you may know
                 </h2>
@@ -163,7 +163,7 @@ const HomePage = () => {
             <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6'>
               {recommendedUsers.map((user, index) => {
                 const isRequestSent = outgoingRequests.has(user._id);
-                
+
                 return (
                   <div
                     key={user._id}
@@ -173,11 +173,17 @@ const HomePage = () => {
                     <div className='card-body p-6 space-y-5'>
                       <div className='flex items-center gap-4'>
                         <div className='relative'>
-                          <img
-                            src={user.profilePic}
-                            alt={user.fullName}
-                            className="w-16 h-16 rounded-full object-cover shadow-lg ring-2 ring-primary/20 group-hover:ring-primary/50 transition-all duration-300"
-                          />
+                          <div className='avatar'>
+                            <div className='w-16 h-16 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2'>
+                              <img
+                                src={user.profilePic || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.fullName || 'User')}&background=random`}
+                                alt={user.fullName || "User"}
+                                onError={(e) => {
+                                  e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.fullName || 'User')}&background=4F46E5`;
+                                }}
+                              />
+                            </div>
+                          </div>
                           <div className='absolute -bottom-1 -right-1 w-6 h-6 bg-green-500 rounded-full border-2 border-base-100 shadow-sm'></div>
                         </div>
                         <div className='flex-1 min-w-0'>
@@ -186,7 +192,7 @@ const HomePage = () => {
                           </h3>
                           {user.location && (
                             <div className='flex items-center text-sm text-base-content/60 mt-1'>
-                              <MapPinIcon className='size-4 mr-2 text-secondary animate-bounce' />
+                              <MapPinIcon className='size-4 mr-2 text-secondary' />
                               <span className='truncate'>{user.location}</span>
                             </div>
                           )}
@@ -202,13 +208,12 @@ const HomePage = () => {
                       )}
 
                       <button
-                        className={`btn w-full transition-all duration-300 ${
-                          isRequestSent 
-                            ? "btn-success opacity-75 cursor-not-allowed bg-success/20 hover:scale-100" 
-                            : isPending 
-                            ? "btn-primary loading" 
+                        className={`btn w-full transition-all duration-300 ${isRequestSent
+                          ? "btn-success opacity-75 cursor-not-allowed bg-success/20 hover:scale-100"
+                          : isPending
+                            ? "btn-primary loading"
                             : "btn-primary hover:scale-105"
-                        }`}
+                          }`}
                         onClick={() => {
                           if (!isRequestSent && !isPending) {
                             sendRequestMutation(user._id);

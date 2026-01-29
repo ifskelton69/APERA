@@ -25,7 +25,7 @@ export const getAuthUser = async () => {
 };
 
 export const completeOnBoarding = async (userData) => {
-  const response = await axiosInstance.post("/auth/onboarding", userData);
+  const response = await axiosInstance.post("/auth/onboard", userData);
   return response.data;
 };
 
@@ -85,3 +85,4 @@ export async function getStreamToken() {
   const response = await axiosInstance.get("/chat/token");
   return response.data;
 }
+

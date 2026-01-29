@@ -1,3 +1,210 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Chat Container Styling */
+.str-chat__channel {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: transparent;
+}
+
+.str-chat__container {
+  width: 100%;
+  height: 100% !important;
+  margin: 0 !important;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+/* Message List Styling */
+.str-chat__list {
+  background: linear-gradient(to bottom, #f9fafb, #ffffff);
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.str-chat__list::-webkit-scrollbar {
+  width: 8px;
+}
+
+.str-chat__list::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+.str-chat__list::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 10px;
+}
+
+.str-chat__list::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Hide default notifications */
+.str-chat__list-notifications {
+  display: none;
+}
+
+/* Message Bubbles */
+.str-chat__message-simple {
+  margin-bottom: 12px;
+}
+
+.str-chat__message-simple__actions {
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.str-chat__message-simple:hover .str-chat__message-simple__actions {
+  opacity: 1;
+}
+
+.str-chat__message-simple-text-inner {
+  border-radius: 18px;
+  padding: 12px 16px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.str-chat__message--me .str-chat__message-simple-text-inner {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+}
+
+.str-chat__message--other .str-chat__message-simple-text-inner {
+  background: #f3f4f6;
+  color: #1f2937;
+}
+
+/* Message Input Styling */
+.str-chat__message-input {
+  border-top: 1px solid #e5e7eb;
+  background: white;
+  padding: 16px;
+}
+
+.str-chat__textarea textarea {
+  border: 2px solid #e5e7eb;
+  border-radius: 24px;
+  padding: 12px 20px;
+  font-size: 15px;
+  transition: all 0.2s ease;
+}
+
+.str-chat__textarea textarea:focus {
+  border-color: #10b981;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+  outline: none;
+}
+
+/* Send Button */
+.str-chat__send-button {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.str-chat__send-button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.str-chat__send-button svg {
+  fill: white;
+}
+
+/* Avatar Styling */
+.str-chat__avatar {
+  border: 2px solid white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Thread Styling */
+.str-chat__thread {
+  background: white;
+  border-left: 1px solid #e5e7eb;
+  box-shadow: -4px 0 12px rgba(0, 0, 0, 0.05);
+}
+
+.str-chat__thread-header {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  padding: 16px;
+}
+
+/* Typing Indicator */
+.str-chat__typing-indicator {
+  color: #6b7280;
+  font-size: 13px;
+  font-style: italic;
+}
+
+/* Emoji Picker */
+.str-chat__emoji-picker {
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+}
+
+/* Date Separator */
+.str-chat__date-separator {
+  color: #9ca3af;
+  font-size: 13px;
+  margin: 24px 0;
+}
+
+.str-chat__date-separator-line {
+  background: #e5e7eb;
+}
+
+/* Reactions */
+.str-chat__reaction-list {
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Loading Indicator */
+.str-chat__loading-indicator {
+  color: #10b981;
+}
+
+/* Channel Header (if visible) */
+.str-chat__header-livestream {
+  display: none;
+}
+
+/* Attachment Preview */
+.str-chat__attachment-preview-list {
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+/* Message Options */
+.str-chat__message-options {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Custom Animations */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.str-chat__message-simple {
+  animation: slideIn 0.3s ease;
+}
