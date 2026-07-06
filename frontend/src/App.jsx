@@ -11,7 +11,7 @@ import NotificationPage from './Pages/notificationPage.jsx'
 import { Toaster } from 'react-hot-toast'
 import Loader from './components/Loader.jsx'
 import Layout from './components/Layout.jsx'
-import useAuthUser from "./hooks/useAuthUser.js"
+import useAuthUser from "./hooks/useAuthuser.js"
 
 const App = () => {
   const { isLoading, authUser } = useAuthUser();
