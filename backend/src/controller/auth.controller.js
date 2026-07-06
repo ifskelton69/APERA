@@ -1,7 +1,7 @@
-import User from '../models/Users.js';
-import jwt from 'jsonwebtoken';
-import { upsertStreamUser } from '../lib/stream.js';
-import cloudinary from '../lib/cloudinary.js';
+import User from "../models/Users.js";
+import jwt from "jsonwebtoken";
+import { upsertStreamUser } from "../lib/stream.js";
+import cloudinary from "../lib/cloudinary.js";
 
 export async function signUp(req, res) {
   const { email, password, fullName } = req.body;
@@ -13,7 +13,9 @@ export async function signUp(req, res) {
     }
 
     if (password.length < 6) {
-      return res.status(400).json({ message: "Password must be at least 6 characters" });
+      return res
+        .status(400)
+        .json({ message: "Password must be at least 6 characters" });
     }
 
     if (!emailRegex.test(email)) {
@@ -22,7 +24,9 @@ export async function signUp(req, res) {
 
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-      return res.status(400).json({ message: "Email already exists, please use a different one" });
+      return res
+        .status(400)
+        .json({ message: "Email already exists, please use a different one" });
     }
 
     // Use ui-avatars.com instead - it's more reliable
@@ -35,7 +39,7 @@ export async function signUp(req, res) {
       profilePic: randomAvatar,
       location: "",
       learningLanguage: "English",
-      nativeLand: "Not specified"
+      nativeLand: "Not specified",
     });
 
     try {
@@ -72,7 +76,9 @@ export async function login(req, res) {
 
   try {
     if (!email || !password) {
-      return res.status(400).json({ message: "Email and password are required" });
+      return res
+        .status(400)
+        .json({ message: "Email and password are required" });
     }
 
     const user = await User.findOne({ email });
@@ -104,18 +110,22 @@ export async function login(req, res) {
 }
 
 export function logout(req, res) {
-  res.clearCookie("jwt");
+  res.clearCookie("jwt", {
+    httpOnly: true,
+    sameSite: "none",
+    secure: true,
+  });
   res.status(200).json({ message: "Logged out successfully" });
 }
 
 export async function onboard(req, res) {
   const userId = req.user._id;
   const { location, fullName, bio, profilePic } = req.body;
-  
+
   try {
     if (!fullName || !fullName.trim()) {
       return res.status(400).json({
-        message: "Full name is required"
+        message: "Full name is required",
       });
     }
 
@@ -127,39 +137,41 @@ export async function onboard(req, res) {
     };
 
     // Upload to Cloudinary if profilePic is provided and it's base64
-    if (profilePic && profilePic.trim() && profilePic.startsWith('data:image')) {
+    if (
+      profilePic &&
+      profilePic.trim() &&
+      profilePic.startsWith("data:image")
+    ) {
       try {
-        
         // Use unsigned upload with upload_preset
         const uploadResponse = await cloudinary.uploader.unsigned_upload(
           profilePic,
-          'profile_pictures', // This is your upload preset name
+          "profile_pictures", // This is your upload preset name
           {
-            cloud_name: process.env.CLOUDINARY_CLOUD_NAME
-          }
+            cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+          },
         );
-        
+
         updateData.profilePic = uploadResponse.secure_url;
       } catch (uploadError) {
         return res.status(500).json({ message: "Error uploading image" });
       }
     }
 
-    const updatedUser = await User.findByIdAndUpdate(
-      userId, 
-      updateData,
-      { new: true, runValidators: false }
-    );
+    const updatedUser = await User.findByIdAndUpdate(userId, updateData, {
+      new: true,
+      runValidators: false,
+    });
 
     if (!updatedUser) {
       return res.status(404).json({ message: "User not found" });
     }
 
     try {
-      await upsertStreamUser({ 
-        id: updatedUser._id.toString(), 
-        name: updatedUser.fullName, 
-        image: updatedUser.profilePic || "" 
+      await upsertStreamUser({
+        id: updatedUser._id.toString(),
+        name: updatedUser.fullName,
+        image: updatedUser.profilePic || "",
       });
       console.log(`Stream user updated for ${updatedUser.fullName}`);
     } catch (error) {
@@ -167,8 +179,7 @@ export async function onboard(req, res) {
     }
 
     res.status(200).json({ success: true, user: updatedUser });
-  }
-  catch (error) {
+  } catch (error) {
     console.log("Error in onboard controller", error);
     return res.status(500).json({ message: "Internal Server Error" });
   }
