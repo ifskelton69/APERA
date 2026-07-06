@@ -22,6 +22,11 @@ app.use(cookieParser());
 app.use("/api/auth",authRoute);
 app.use("/api/users",userRoute);
 app.use("/api/chat",chatRoute);
+
+app.get("/", (req, res) => {
+  res.json({ message: "Backend is running 🚀" });
+});
+
 // if(process.env.NODE_ENV === 'production'){
 //     app.use(express.static(path.join(__dirname,'../frontend/dist')));
 //     app.get('*',(req,res)=>{
