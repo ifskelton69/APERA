@@ -2,7 +2,7 @@ import { useState } from 'react';
 import {  Home, Users, Bell, Settings, User, LogOutIcon } from 'lucide-react';
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { logout } from '../lib/api';
-import useAuthUser from '../hooks/useAuthUser';
+import useAuthUser from '../hooks/useAuthuser';
 
 const Sidebar = () => {
     const [isOpen, setIsOpen] = useState(false);
