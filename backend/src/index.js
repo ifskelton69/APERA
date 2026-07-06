@@ -13,7 +13,7 @@ const app = express();
 const PORT = process.env.PORT || 5001;
 const __dirname = path.resolve();
 app.use(cors({
-    origin: 'http://localhost:5173',
+    origin: 'apera-omega.vercel.app',
     credentials: true,//allow cookies to be sent by frontend
 }));
 app.use(express.json({ limit: '50mb' }));
