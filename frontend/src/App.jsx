@@ -9,7 +9,7 @@ import Profile from './Pages/profilePage.jsx'
 import Settings from './Pages/settings.jsx'
 import NotificationPage from './Pages/notificationPage.jsx'
 import { Toaster } from 'react-hot-toast'
-import Loader from './components/loader.jsx'
+import Loader from './components/Loader.jsx'
 import Layout from './components/Layout.jsx'
 import useAuthUser from "./hooks/useAuthUser.js"
 
