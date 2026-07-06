@@ -4,56 +4,39 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { BellIcon, LogOutIcon, ShipWheel, Settings, User, ChevronDown } from 'lucide-react';
 import { logout } from '../lib/api';
 import useAuthUser from '../hooks/useAuthUser';
+import toast from 'react-hot-toast'; // ✅ fixed from react-toastify
 
 const Navbar = () => {
   const { authUser } = useAuthUser();
   const location = useLocation();
   const navigate = useNavigate();
   const isChatPage = location.pathname?.startsWith("/chat");
-
   const queryclient = useQueryClient();
 
-  const { mutate: logoutMutaion } = useMutation({
+  const { mutate: logoutMutation } = useMutation({
     mutationFn: logout,
     onSuccess: () => queryclient.invalidateQueries({ queryKey: ['authUser'] })
-  })
+  });
 
-  // Dropdown state
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
 
-  // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setIsDropdownOpen(false);
       }
     };
-
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const toggleDropdown = () => {
-    setIsDropdownOpen(!isDropdownOpen);
-  };
-
-  const handleProfileClick = () => {
-    navigate('/profile');
-    setIsDropdownOpen(false);
-  };
-
-  const handleSettingsClick = () => {
-    navigate('/settings');
-    setIsDropdownOpen(false);
-  };
-
   return (
-    <nav className="bg-base-200/95 backdrop-blur-md border-b border-base-300 sticky top-0 z-30 h-14 sm:h-16 flex items-center shadow-sm">
-      <div className="container mx-auto px-3 sm:px-4 md:px-6 lg:px-8">
-        <div className="flex items-center justify-between w-full">
+    <nav className="sticky top-0 z-30 h-16 flex items-center bg-gradient-to-r from-slate-900 via-blue-950 to-slate-900 border-b border-white/10 shadow-lg">
+      <div className="w-full px-4 sm:px-6 lg:px-10">
+        <div className="flex items-center justify-between">
 
-          {/* LOGO - ONLY IN THE CHAT PAGE */}
+          {/* LOGO */}
           {isChatPage || (
             <div className="flex-shrink-0 pl-2 sm:pl-4 lg:pl-6">
               <Link to="/" className="flex items-center gap-1.5 sm:gap-2.5 hover:scale-105 transition-transform duration-200">
@@ -65,66 +48,88 @@ const Navbar = () => {
             </div>
           )}
 
-          {/* Right Side Actions */}
-          <div className="flex items-center gap-1 sm:gap-2 lg:gap-4 ml-auto">
+          {/* Right Side */}
+          <div className="flex items-center gap-3 ml-auto">
 
-            {/* User Profile Dropdown */}
+            {/* Notification Bell */}
+            <button
+              onClick={() => navigate('/notification')}
+              className="relative p-2 rounded-xl text-slate-400 hover:text-white hover:bg-white/10 transition-all duration-200"
+            >
+              <BellIcon className="size-5" />
+              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-blue-500 rounded-full ring-2 ring-slate-900" />
+            </button>
+
+            <div className="w-px h-6 bg-white/10" />
+
+            {/* User Dropdown */}
             <div className="relative" ref={dropdownRef}>
-              <div 
-                className="flex items-center gap-1 sm:gap-2 p-1.5 sm:p-2 rounded-lg hover:bg-base-300/50 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary/20 cursor-pointer"
-                onClick={toggleDropdown}
+              <button
+                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                className="flex items-center gap-2.5 px-2 py-1.5 rounded-xl hover:bg-white/10 transition-all duration-200 group"
               >
-                <div className="avatar online">
-                  <div className="w-7 h-7 sm:w-8 sm:h-8 lg:w-9 lg:h-9 rounded-full ring ring-primary ring-offset-base-100 ring-offset-1">
-                    <img
-                      src={
-                        authUser?.profilePic ||
-                        `https://ui-avatars.com/api/?name=${encodeURIComponent(authUser?.fullName || 'User')}&background=random`
-                      }
-                      alt={authUser?.fullName || "User"}
-                      onError={(e) => {
-                        e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(authUser?.fullName || 'User')}&background=random`;
-                      }}
-                    />
-                  </div>
+                <div className="relative">
+                  <img
+                    src={
+                      authUser?.profilePic ||
+                      `https://ui-avatars.com/api/?name=${encodeURIComponent(authUser?.fullName || 'User')}&background=3b82f6&color=fff`
+                    }
+                    alt={authUser?.fullName || "User"}
+                    onError={(e) => {
+                      e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(authUser?.fullName || 'User')}&background=3b82f6&color=fff`;
+                    }}
+                    className="w-8 h-8 rounded-full object-cover ring-2 ring-blue-500/50 group-hover:ring-blue-400 transition-all duration-200"
+                  />
+                  <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-400 rounded-full ring-2 ring-slate-900" />
                 </div>
 
-                {/* Show name and dropdown arrow on larger screens */}
-                <div className="hidden md:flex items-center gap-1">
-                  <div className="flex flex-col text-left">
-                    <span className="text-sm font-medium text-base-content truncate max-w-20 lg:max-w-24">
-                      {authUser?.fullName || 'User'}
-                    </span>
-                    <span className="text-xs text-success">Online</span>
-                  </div>
-                  <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${isDropdownOpen ? 'rotate-180' : ''}`} />
+                <div className="hidden md:flex flex-col text-left">
+                  <span className="text-sm font-semibold text-white truncate max-w-[100px]">
+                    {authUser?.fullName || 'User'}
+                  </span>
+                  <span className="text-xs text-emerald-400 font-medium">● Online</span>
                 </div>
-              </div>
 
-              {/* Dropdown Menu */}
+                <ChevronDown className={`hidden md:block w-4 h-4 text-slate-400 transition-transform duration-200 ${isDropdownOpen ? 'rotate-180' : ''}`} />
+              </button>
+
               {isDropdownOpen && (
-                <div className="absolute right-0 mt-2 w-48 bg-base-100 rounded-lg shadow-lg border border-base-300 py-2 z-50">
+                <div className="absolute right-0 mt-2 w-52 bg-slate-800/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/10 py-2 overflow-hidden">
+                  <div className="px-4 py-3 border-b border-white/10 mb-1">
+                    <p className="text-sm font-semibold text-white truncate">{authUser?.fullName}</p>
+                    <p className="text-xs text-slate-400 truncate">{authUser?.email}</p>
+                  </div>
+
                   <button
-                    onClick={handleProfileClick}
-                    className="w-full px-4 py-2 text-left hover:bg-base-200 flex items-center gap-2 transition-colors"
+                    onClick={() => { navigate('/profile'); setIsDropdownOpen(false); }}
+                    className="w-full px-4 py-2.5 text-left hover:bg-white/10 flex items-center gap-3 transition-colors text-slate-300 hover:text-white group"
                   >
-                    <User className="w-4 h-4" />
-                    <span>Profile</span>
+                    <div className="p-1 rounded-lg bg-blue-500/20 group-hover:bg-blue-500/30 transition-colors">
+                      <User className="w-3.5 h-3.5 text-blue-400" />
+                    </div>
+                    <span className="text-sm font-medium">Profile</span>
                   </button>
+
                   <button
-                    onClick={handleSettingsClick}
-                    className="w-full px-4 py-2 text-left hover:bg-base-200 flex items-center gap-2 transition-colors"
+                    onClick={() => { navigate('/settings'); setIsDropdownOpen(false); }}
+                    className="w-full px-4 py-2.5 text-left hover:bg-white/10 flex items-center gap-3 transition-colors text-slate-300 hover:text-white group"
                   >
-                    <Settings className="w-4 h-4" />
-                    <span>Settings</span>
+                    <div className="p-1 rounded-lg bg-purple-500/20 group-hover:bg-purple-500/30 transition-colors">
+                      <Settings className="w-3.5 h-3.5 text-purple-400" />
+                    </div>
+                    <span className="text-sm font-medium">Settings</span>
                   </button>
-                  <hr className="my-2 border-base-300" />
+
+                  <div className="my-2 border-t border-white/10" />
+
                   <button
-                    onClick={() => logoutMutaion()}
-                    className="w-full px-4 py-2 text-left hover:bg-base-200 flex items-center gap-2 transition-colors text-error"
+                    onClick={() => logoutMutation()}
+                    className="w-full px-4 py-2.5 text-left hover:bg-red-500/10 flex items-center gap-3 transition-colors text-slate-300 hover:text-red-400 group"
                   >
-                    <LogOutIcon className="w-4 h-4" />
-                    <span>Logout</span>
+                    <div className="p-1 rounded-lg bg-red-500/20 group-hover:bg-red-500/30 transition-colors">
+                      <LogOutIcon className="w-3.5 h-3.5 text-red-400" />
+                    </div>
+                    <span className="text-sm font-medium">Logout</span>
                   </button>
                 </div>
               )}
@@ -136,4 +141,4 @@ const Navbar = () => {
   );
 };
 
-export default Navbar
+export default Navbar;

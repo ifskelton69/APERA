@@ -24,10 +24,7 @@ const OnBoardingPage = () => {
     mutationFn: completeOnBoarding,
     onSuccess: () => {
       toast.success("Profile completed successfully");
-      // Force refetch the auth user data
       queryClient.invalidateQueries({ queryKey: ['authUser'] });
-      // Also manually refetch to ensure immediate update
-      // refetch(); // Uncomment if you have refetch available
     },
     onError: (error) => {
       toast.error(error?.response?.data?.message || "Something went wrong");
@@ -38,14 +35,12 @@ const OnBoardingPage = () => {
     const file = e.target.files[0];
     if (!file) return;
 
-    // Validate file type
     const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
     if (!validTypes.includes(file.type)) {
       toast.error('Please select a valid image file (JPEG, PNG, WebP)');
       return;
     }
 
-    // Validate file size (5MB max)
     if (file.size > 5 * 1024 * 1024) {
       toast.error('Image size should be less than 5MB');
       return;
@@ -53,7 +48,6 @@ const OnBoardingPage = () => {
 
     setIsImageUploading(true);
 
-    // Create preview
     const reader = new FileReader();
     reader.onload = (event) => {
       const imageDataUrl = event.target.result;
@@ -86,19 +80,25 @@ const OnBoardingPage = () => {
   }
   
   return (
-    <div className='min-h-screen flex bg-base-100 justify-center items-center p-4'>
-      <div className='card bg-base-200 w-full max-w-3xl shadow-xl'>
-        <div className='card-body p-6 sm:p-8'>
-          <h1 className='text-2xl sm:text-3xl font-bold text-center mb-6'> Complete your profile</h1>
+    <div className='min-h-screen flex bg-gradient-to-br from-orange-50 via-amber-50 to-yellow-50 justify-center items-center p-4'>
+      <div className='w-full max-w-3xl bg-white shadow-2xl rounded-2xl border border-orange-100'>
+        <div className='p-6 sm:p-8'>
+          <div className='text-center mb-8'>
+            <h1 className='text-3xl sm:text-4xl font-bold bg-gradient-to-r from-orange-600 to-amber-600 bg-clip-text text-transparent mb-2'>
+              Complete your profile
+            </h1>
+            <p className='text-gray-600'>Let's set up your account</p>
+          </div>
+
           <form onSubmit={handleSubmit} className='space-y-6'>
             <div className='flex flex-col items-center justify-center space-y-4'>
 
               {/* Image upload section */}
               <div className='relative group'>
-                <div className='size-32 overflow-hidden rounded-full bg-base-300 border-4 border-base-300 hover:border-primary transition-colors duration-200'>
+                <div className='size-32 overflow-hidden rounded-full bg-orange-50 border-4 border-orange-200 hover:border-orange-400 transition-colors duration-200'>
                   {isImageUploading ? (
                     <div className='flex items-center justify-center h-full'>
-                      <LoaderIcon className='size-8 text-primary animate-spin'/>
+                      <LoaderIcon className='size-8 text-orange-500 animate-spin'/>
                     </div>
                   ) : imagePreview ? (
                     <img 
@@ -109,10 +109,10 @@ const OnBoardingPage = () => {
                     />
                   ) : (
                     <div 
-                      className='flex items-center justify-center h-full cursor-pointer hover:bg-base-200 transition-colors duration-200'
+                      className='flex items-center justify-center h-full cursor-pointer hover:bg-orange-100 transition-colors duration-200'
                       onClick={handleImageClick}
                     >
-                      <CameraIcon className='size-12 text-base-content opacity-50'/>
+                      <CameraIcon className='size-12 text-orange-400 opacity-70'/>
                     </div>
                   )}
                 </div>
@@ -129,12 +129,14 @@ const OnBoardingPage = () => {
                   <button
                     type="button"
                     onClick={handleRemoveImage}
-                    className='absolute -top-2 -right-2 btn btn-circle btn-sm btn-error shadow-lg hover:btn-error-focus'
+                    className='absolute -top-2 -right-2 bg-red-500 hover:bg-red-600 text-white rounded-full p-2 shadow-lg transition-colors'
                   >
                     <X className='size-4' />
                   </button>
                 )}
               </div>
+
+              <p className='text-sm text-gray-500'>Click to upload your profile picture</p>
 
               {/* Hidden file input */}
               <input
@@ -150,7 +152,7 @@ const OnBoardingPage = () => {
             {/* fullName */}
             <div className='form-control'>
                <label className='label'> 
-                <span className='label-text font-medium'> Full Name</span>
+                <span className='text-sm font-semibold text-gray-700'>Full Name *</span>
                </label>
                <input 
                 type="text"
@@ -158,7 +160,7 @@ const OnBoardingPage = () => {
                 value={formstate.fullName}
                 onChange={(e) => setFormstate({...formstate, fullName: e.target.value})}
                 placeholder='Enter your full name'
-                className='input input-bordered w-full focus:input-primary'
+                className='input input-bordered w-full bg-white border-gray-300 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 transition-all'
                 required
                 />
             </div>
@@ -166,8 +168,8 @@ const OnBoardingPage = () => {
             {/* bio */}
             <div className='form-control'>
                <label className='label'> 
-                <span className='label-text font-medium'> Bio</span>
-                <span className='label-text-alt text-base-content opacity-60'>
+                <span className='text-sm font-semibold text-gray-700'>Bio</span>
+                <span className='text-xs text-gray-500'>
                   {formstate.bio.length}/150
                 </span>
                 </label>
@@ -176,7 +178,7 @@ const OnBoardingPage = () => {
                 onChange={(e) => setFormstate({...formstate, bio: e.target.value})}
                 value={formstate.bio}
                 placeholder='Tell us about yourself...'
-                className='textarea textarea-bordered h-24 focus:textarea-primary resize-none'
+                className='textarea textarea-bordered h-24 bg-white border-gray-300 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 resize-none transition-all'
                 rows={3}
                 maxLength={150}
                 />
@@ -185,15 +187,15 @@ const OnBoardingPage = () => {
             {/* location */}
             <div className='form-control'>
                <label className='label'>
-                <span className='label-text font-medium'> Location</span>
+                <span className='text-sm font-semibold text-gray-700'>Location</span>
                 </label>
                 <div className='relative'>
-                  <MapPinIcon className='absolute top-1/2 transform -translate-y-1/2 left-3 size-5 text-base-content opacity-70'/>
+                  <MapPinIcon className='absolute top-1/2 transform -translate-y-1/2 left-3 size-5 text-orange-500'/>
                 <input 
                 type="text"
                 onChange={(e) => setFormstate({...formstate, location: e.target.value})}
                 value={formstate.location}
-                className='input input-bordered w-full pl-10 focus:input-primary'
+                className='input input-bordered w-full pl-10 bg-white border-gray-300 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 transition-all'
                 placeholder='City, Country'
                 />
                 </div>
@@ -202,7 +204,7 @@ const OnBoardingPage = () => {
             {/* submit button */}
             <button 
               type='submit'
-              className={`btn btn-primary w-full text-white`}
+              className='btn bg-orange-500 hover:bg-orange-600 border-none text-white w-full shadow-lg hover:shadow-xl transition-all hover:scale-105'
               disabled={isPending || isImageUploading || !formstate.fullName.trim()} 
             >
               {isPending ? (

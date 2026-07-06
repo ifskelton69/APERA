@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
-import { Menu, X, Home, Users, Bell, Settings, User, LogOut, LogOutIcon } from 'lucide-react';
+import { useState } from 'react';
+import {  Home, Users, Bell, Settings, User, LogOutIcon } from 'lucide-react';
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { logout } from '../lib/api';
-import useAuthUser from '../hooks/useAuthuser';
+import useAuthUser from '../hooks/useAuthUser';
 
 const Sidebar = () => {
     const [isOpen, setIsOpen] = useState(false);
@@ -24,7 +24,6 @@ const Sidebar = () => {
 
     const menuItems = [
         { icon: Home, label: 'Home', href: '/' },
-        { icon: Users, label: 'Friends', href: '/friends' },
         { icon: Bell, label: 'Notifications', href: '/notification' },
         { icon: User, label: 'Profile', href: '/profile' },
         { icon: Settings, label: 'Settings', href: '/settings' },

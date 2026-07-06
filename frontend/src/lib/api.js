@@ -72,12 +72,12 @@ export async function getFriendRequests() {
 }
 
 export async function acceptFriendRequest(requestId) {
-  const response = await axiosInstance.put(`/users/friend-request/${requestId}/accept`);
+  const response = await axiosInstance.put(`/users/friend-requests/${requestId}/accept`); 
   return response.data;
 }
 
 export async function rejectFriendRequest(requestId) {
-  const response = await axiosInstance.put(`/users/friend-request/${requestId}/reject`);
+  const response = await axiosInstance.put(`/users/friend-requests/${requestId}/reject`);
   return response.data;
 }
 

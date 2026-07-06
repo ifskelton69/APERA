@@ -5,7 +5,6 @@ import { useQuery } from "@tanstack/react-query";
 import { getStreamToken } from "../lib/api";
 import {
   Channel,
-  ChannelHeader,
   Chat,
   MessageInput,
   MessageList,
@@ -13,14 +12,12 @@ import {
   Window,
 } from "stream-chat-react";
 import { StreamChat } from "stream-chat";
-import toast from "react-hot-toast";
+import { toast } from "react-toastify";
 import ChatLoader from "../components/ChatLoader";
 import { Video, Phone, LogOut } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
-
 const STREAM_API_KEY = import.meta.env.VITE_STREAM_API_KEY;
-
 
 const ChatPage = () => {
   const navigate = useNavigate();
@@ -29,6 +26,7 @@ const ChatPage = () => {
   const [chatClient, setChatClient] = useState(null);
   const [channel, setChannel] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [otherUser, setOtherUser] = useState(null);
 
   const { authUser } = useAuthUser();
 
@@ -64,6 +62,19 @@ const ChatPage = () => {
 
         await currChannel.watch();
 
+        // Get the other user's info from channel members
+        const members = Object.values(currChannel.state.members);
+        const otherMember = members.find(member => member.user.id !== authUser._id);
+        
+        if (otherMember) {
+          setOtherUser({
+            id: otherMember.user.id,
+            name: otherMember.user.name,
+            image: otherMember.user.image
+          });
+          console.log("Other user:", otherMember.user);
+        }
+
         setChatClient(client);
         setChannel(currChannel);
       } catch (error) {
@@ -89,13 +100,9 @@ const ChatPage = () => {
 
       channel.sendMessage({
         text: `📹 Join my video call: ${callUrl}`,
-        attachments: [{
-          type: 'video_call',
-          url: callUrl
-        }]
       });
 
-      toast.success("Video call link sent!");
+      toast.info("Video call functionality is not yet implemented!");
     }
   };
 
@@ -116,14 +123,29 @@ const ChatPage = () => {
               {/* Custom Header with Call Buttons */}
               <div className="flex items-center justify-between px-6 py-4 bg-gradient-to-r from-green-600 to-emerald-600 text-white shadow-lg">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center font-semibold">
-                    {channel?.data?.name?.charAt(0) || "C"}
-                  </div>
+                  {/* Profile Picture */}
+                  {otherUser?.image ? (
+                    <div className="w-10 h-10 rounded-full overflow-hidden ring-2 ring-white/30">
+                      <img 
+                        src={otherUser.image || `https://ui-avatars.com/api/?name=${encodeURIComponent(otherUser?.name || 'User')}&background=random`}
+                        alt={otherUser.name}
+                        onError={(e) => {
+                          e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(otherUser?.name || 'User')}&background=4F46E5`;
+                        }}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  ) : (
+                    <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center font-semibold text-lg ring-2 ring-white/30">
+                      {otherUser?.name?.charAt(0).toUpperCase() || "U"}
+                    </div>
+                  )}
+                  
                   <div>
                     <h2 className="font-semibold text-lg">
-                      {channel?.data?.name || "Chat"}
+                      {otherUser?.name || "Chat"}
                     </h2>
-                    <p className="text-xs text-green-100">Online</p>
+                    <p className="text-xs text-green-100"></p>
                   </div>
                 </div>
 
@@ -147,9 +169,8 @@ const ChatPage = () => {
                     title="Go Home"
                     onClick={() => navigate("/")}
                   >
-                    <LogOut />
+                    <LogOut className="w-5 h-5" />
                   </button>
-
                 </div>
               </div>
 

@@ -39,7 +39,7 @@ const userSchema = new mongoose.Schema({
         ref: "User",
     },],
 
-}, { timestamps: true }); // Define the user schema with timestamps
+}, { timestamps: true }); // Define the user schema with <timestamps></timestamps>
 
 userSchema.pre('save', async function (next) {
     if (!this.isModified('password')) {

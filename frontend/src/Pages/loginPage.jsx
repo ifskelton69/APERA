@@ -1,43 +1,43 @@
-import React, { useState } from 'react'
-import { login } from '../lib/api';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { Eye, EyeOff, ShipWheelIcon, Mail, Lock, Sparkles } from 'lucide-react';
-import { Link } from 'react-router-dom';
-import toast from 'react-hot-toast';
+import React, { useState } from "react";
+import { login } from "../lib/api";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { Eye, EyeOff, ShipWheelIcon, Mail, Lock, Sparkles } from "lucide-react";
+import { Link } from "react-router-dom";
+import toast from "react-hot-toast";
 
 const LoginPage = () => {
   const [loginData, setLoginData] = useState({
-    email: '',
-    password: ''
+    email: "",
+    password: "",
   });
   const [showPassword, setShowPassword] = useState(false);
   const queryClient = useQueryClient();
 
-  const { mutate: loginMutation, isPending } = useMutation({  
+  const { mutate: loginMutation, isPending } = useMutation({
     mutationFn: login,
     onSuccess: () => {
       toast.success("Welcome back! 🎉", {
         style: {
-          background: 'linear-gradient(135deg, #10b981, #059669)',
-          color: 'white',
+          background: "linear-gradient(135deg, #10b981, #059669)",
+          color: "white",
         },
       });
-      queryClient.invalidateQueries({ queryKey: ['authUser'] });
+      queryClient.invalidateQueries({ queryKey: ["authUser"] });
     },
     onError: (error) => {
       toast.error(error?.response?.data?.message || "Something went wrong", {
         style: {
-          background: 'linear-gradient(135deg, #ef4444, #dc2626)',
-          color: 'white',
+          background: "linear-gradient(135deg, #ef4444, #dc2626)",
+          color: "white",
         },
       });
-    }
+    },
   });
 
   const handleLogin = (e) => {
     e.preventDefault();
     loginMutation(loginData);
-  }
+  };
 
   return (
     <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
@@ -58,7 +58,7 @@ const LoginPage = () => {
               left: `${Math.random() * 100}%`,
               top: `${Math.random() * 100}%`,
               animationDelay: `${i * 0.5}s`,
-              animationDuration: `${3 + Math.random() * 2}s`
+              animationDuration: `${3 + Math.random() * 2}s`,
             }}
           />
         ))}
@@ -105,7 +105,12 @@ const LoginPage = () => {
                           placeholder="Enter your email"
                           className="w-full pl-12 pr-4 py-3 bg-gray-50/50 border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-300 placeholder-gray-400"
                           value={loginData.email}
-                          onChange={(e) => setLoginData({ ...loginData, email: e.target.value })}
+                          onChange={(e) =>
+                            setLoginData({
+                              ...loginData,
+                              email: e.target.value,
+                            })
+                          }
                           required
                         />
                       </div>
@@ -123,7 +128,12 @@ const LoginPage = () => {
                           placeholder="Enter your password"
                           className="w-full pl-12 pr-14 py-3 bg-gray-50/50 border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-300 placeholder-gray-400"
                           value={loginData.password}
-                          onChange={(e) => setLoginData({ ...loginData, password: e.target.value })}
+                          onChange={(e) =>
+                            setLoginData({
+                              ...loginData,
+                              password: e.target.value,
+                            })
+                          }
                           required
                         />
                         <button
@@ -132,15 +142,19 @@ const LoginPage = () => {
                           onClick={() => setShowPassword(!showPassword)}
                           tabIndex={-1}
                         >
-                          {showPassword ? <EyeOff className="size-5" /> : <Eye className="size-5" />}
+                          {showPassword ? (
+                            <EyeOff className="size-5" />
+                          ) : (
+                            <Eye className="size-5" />
+                          )}
                         </button>
                       </div>
                     </div>
 
                     {/* Forgot Password Link */}
                     <div className="text-right">
-                      <Link 
-                        to="/forgot-password" 
+                      <Link
+                        to="/forgot-password"
                         className="text-sm text-blue-600 hover:text-blue-800 font-medium hover:underline transition-colors"
                       >
                         Forgot password?
@@ -148,9 +162,9 @@ const LoginPage = () => {
                     </div>
 
                     {/* Submit Button */}
-                    <button 
-                      type="submit" 
-                      className="w-full py-3 px-6 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold rounded-2xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300 disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none"
+                    <button
+                      type="submit"
+                      className="w-full py-3 px-6 bg-[#186dc7] hover:bg-[#c7980b] text-white font-semibold rounded-2xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300 disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none"
                       disabled={isPending}
                     >
                       {isPending ? (
@@ -170,8 +184,8 @@ const LoginPage = () => {
                     <div className="text-center pt-4 border-t border-gray-200">
                       <p className="text-gray-600">
                         New to APERA?{" "}
-                        <Link 
-                          to="/signup" 
+                        <Link
+                          to="/signup"
                           className="text-blue-600 hover:text-blue-800 font-semibold hover:underline transition-colors"
                         >
                           Create your account
@@ -186,50 +200,66 @@ const LoginPage = () => {
               <div className="hidden lg:flex w-full lg:w-1/2 bg-gradient-to-br from-blue-600/10 via-purple-600/10 to-indigo-600/10 items-center justify-center relative overflow-hidden">
                 {/* Background Pattern */}
                 <div className="absolute inset-0 opacity-10">
-                  <div className="absolute inset-0" style={{
-                    backgroundImage: `url("data:image/svg+xml,%3csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3e%3cg fill='none' fill-rule='evenodd'%3e%3cg fill='%239C92AC' fill-opacity='0.1'%3e%3ccircle cx='30' cy='30' r='4'/%3e%3c/g%3e%3c/g%3e%3c/svg%3e")`,
-                  }}></div>
+                  <div
+                    className="absolute inset-0"
+                    style={{
+                      backgroundImage: `url("data:image/svg+xml,%3csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3e%3cg fill='none' fill-rule='evenodd'%3e%3cg fill='%239C92AC' fill-opacity='0.1'%3e%3ccircle cx='30' cy='30' r='4'/%3e%3c/g%3e%3c/g%3e%3c/svg%3e")`,
+                    }}
+                  ></div>
                 </div>
-                
+
                 <div className="relative z-10 max-w-md p-6 text-center">
                   <div className="relative aspect-square max-w-xs mx-auto mb-6">
-                    <img 
-                      src="/loginCall.svg" 
-                      alt="Welcome illustration" 
-                      className="relative w-full h-full object-contain drop-shadow-2xl transform hover:scale-105 transition-transform duration-300" 
+                    <img
+                      src="/loginCall.svg"
+                      alt="Welcome illustration"
+                      className="relative w-full h-full object-contain drop-shadow-2xl transform hover:scale-105 transition-transform duration-300"
                     />
                   </div>
-                  
+
                   <div className="space-y-4">
                     <h2 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-gray-800 to-gray-600">
                       Join Our Community
                     </h2>
                     <p className="text-base text-gray-600 leading-relaxed">
-                      Connect with friends and family around the world. Your journey to meaningful connections starts here.
+                      Connect with friends and family around the world. Your
+                      journey to meaningful connections starts here.
                     </p>
-                    
+
                     {/* Feature Points */}
                     <div className="flex justify-center space-x-6 pt-3">
                       <div className="text-center">
-                        <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center mx-auto mb-2">
-                          <span className="text-white font-bold text-base">🌟</span>
+                        <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center mx-auto mb-2">
+                          <span className="text-white font-bold text-base">
+                            🌟
+                          </span>
                         </div>
-                        <p className="text-xs font-medium text-gray-600">Premium Experience</p>
+                        <p className="text-xs font-medium text-gray-600">
+                          Premium Experience
+                        </p>
                       </div>
                       <div className="text-center">
-                        <div className="w-10 h-10 bg-gradient-to-r from-green-500 to-blue-500 rounded-full flex items-center justify-center mx-auto mb-2">
-                          <span className="text-white font-bold text-base">🔒</span>
+                        <div className="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-2">
+                          <span className="text-white font-bold text-base">
+                            🔒
+                          </span>
                         </div>
-                        <p className="text-xs font-medium text-gray-600">Secure & Private</p>
+                        <p className="text-xs font-medium text-gray-600">
+                          Secure & Private
+                        </p>
                       </div>
                       <div className="text-center">
-                        <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center mx-auto mb-2">
-                          <span className="text-white font-bold text-base">🚀</span>
+                        <div className="w-10 h-10 bg-purple-500  rounded-full flex items-center justify-center mx-auto mb-2">
+                          <span className="text-white font-bold text-base">
+                            🚀
+                          </span>
                         </div>
-                        <p className="text-xs font-medium text-gray-600">Lightning Fast</p>
+                        <p className="text-xs font-medium text-gray-600">
+                          Lightning Fast
+                        </p>
                       </div>
                     </div>
-                    
+
                     {/* Animated Dots */}
                     <div className="flex justify-center space-x-2 pt-6">
                       <div className="w-3 h-3 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 animate-pulse"></div>
@@ -246,12 +276,21 @@ const LoginPage = () => {
 
       <style jsx>{`
         @keyframes float {
-          0%, 100% { transform: translateY(0px) rotate(0deg); }
-          50% { transform: translateY(-20px) rotate(180deg); }
+          0%,
+          100% {
+            transform: translateY(0px) rotate(0deg);
+          }
+          50% {
+            transform: translateY(-20px) rotate(180deg);
+          }
         }
         @keyframes spin-slow {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
+          from {
+            transform: rotate(0deg);
+          }
+          to {
+            transform: rotate(360deg);
+          }
         }
         .animate-float {
           animation: float 6s ease-in-out infinite;
@@ -261,7 +300,7 @@ const LoginPage = () => {
         }
       `}</style>
     </div>
-  )
-}
+  );
+};
 
-export default LoginPage
+export default LoginPage;
