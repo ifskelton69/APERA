@@ -23,8 +23,8 @@ app.use("/api/auth",authRoute);
 app.use("/api/users",userRoute);
 app.use("/api/chat",chatRoute);
 
-app.get("/", (req, res) => {
-  res.json({ message: "Backend is running 🚀" });
+app.get("/health", (req, res) => {
+  res.json({ status: "ok" });
 });
 
 // if(process.env.NODE_ENV === 'production'){
