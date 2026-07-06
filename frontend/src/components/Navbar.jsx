@@ -3,8 +3,8 @@ import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { BellIcon, LogOutIcon, ShipWheel, Settings, User, ChevronDown } from 'lucide-react';
 import { logout } from '../lib/api';
-import useAuthUser from '../hooks/useAuthUser';
-import toast from 'react-hot-toast'; // ✅ fixed from react-toastify
+import useAuthUser from '../hooks/useAuthuser';
+import toast from 'react-hot-toast'; //
 
 const Navbar = () => {
   const { authUser } = useAuthUser();
