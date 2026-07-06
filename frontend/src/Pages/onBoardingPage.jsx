@@ -3,7 +3,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import toast, { LoaderIcon } from 'react-hot-toast';
 import { CameraIcon, MapPinIcon, ShipWheelIcon, ImageIcon, X } from 'lucide-react';
 import { completeOnBoarding } from '../lib/api';
-import useAuthUser from '../hooks/useAuthUser';
+import useAuthUser from '../hooks/useAuthuser';
 
 const OnBoardingPage = () => {
   const { authUser } = useAuthUser();

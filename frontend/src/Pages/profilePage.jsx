@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { MapPinIcon, MailIcon, CalendarIcon, EditIcon, CameraIcon, UserIcon } from 'lucide-react';
-import useAuthUser from '../hooks/useAuthUser';
+import useAuthUser from '../hooks/useAuthuser';
 
 const Profile = () => {
   const { authUser } = useAuthUser();

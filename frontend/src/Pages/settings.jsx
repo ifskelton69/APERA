@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Shield, Bell, Lock, Eye, Globe, Palette, User, Mail, Phone } from 'lucide-react';
-import useAuthUser from '../hooks/useAuthUser';
+import useAuthUser from '../hooks/useAuthuser';
 
 const Settings = () => {
   const { authUser } = useAuthUser();
